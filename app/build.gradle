@@ -1,0 +1,62 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.artyom.vlasov.notes"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+    implementation "androidx.core:core-ktx:$versions.ktx"
+    implementation "androidx.fragment:fragment-ktx:$versions.ktxFragment"
+    implementation "androidx.appcompat:appcompat:$versions.androidx"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$versions.lifecycle"
+    implementation "android.arch.navigation:navigation-fragment-ktx:$versions.navigation"
+    implementation "android.arch.navigation:navigation-fragment:$versions.navigation"
+    implementation "android.arch.navigation:navigation-ui:$versions.navigation"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines"
+
+    implementation "androidx.room:room-runtime:$versions.room"
+    implementation "androidx.room:room-ktx:$versions.room"
+    annotationProcessor "androidx.room:room-compiler:$versions.room"
+
+    implementation "org.koin:koin-android:$versions.koin"
+    implementation "org.koin:koin-androidx-viewmodel:$versions.koin"
+
+    implementation "androidx.legacy:legacy-support-v4:$versions.legacySupport"
+
+    implementation "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:$versions.bindingCollections"
+    implementation "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:$versions.bindingCollections"
+
+    testImplementation "junit:junit:$versions.junit"
+    testImplementation "org.assertj:assertj-core:$versions.assertj"
+    androidTestImplementation "com.android.support.test:runner:$versions.testRunner"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$versions.espresso"
+}
