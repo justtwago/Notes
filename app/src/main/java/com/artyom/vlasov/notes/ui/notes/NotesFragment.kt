@@ -1,6 +1,5 @@
 package com.artyom.vlasov.notes.ui.notes
 
-import android.util.Log
 import com.artyom.vlasov.notes.R
 import com.artyom.vlasov.notes.databinding.FragmentNotesBinding
 import com.artyom.vlasov.notes.model.Gesture
@@ -16,6 +15,10 @@ class NotesFragment : BaseFragment<FragmentNotesBinding>() {
     }
 
     override fun onGestureDetected(gesture: Gesture) {
-        Log.d("MultiFingerGestureDetector", gesture.toString())
+        when (gesture) {
+            Gesture.Swipe.Right -> viewModel.onSwipeRight()
+            Gesture.Swipe.Left -> viewModel.onSwipeLeft()
+            Gesture.Tap.Double.DoubleFinger -> viewModel.onDoubleTapDoubleFinger()
+        }
     }
 }

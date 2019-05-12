@@ -1,6 +1,5 @@
 package com.artyom.vlasov.notes.ui.details
 
-import android.util.Log
 import com.artyom.vlasov.notes.R
 import com.artyom.vlasov.notes.databinding.FragmentNoteDetailsBinding
 import com.artyom.vlasov.notes.model.Gesture
@@ -15,7 +14,5 @@ class NoteDetailsFragment : BaseFragment<FragmentNoteDetailsBinding>() {
         binding.viewModel = viewModel
     }
 
-    override fun onGestureDetected(gesture: Gesture) {
-        Log.d("MultiFingerGestureDetector", gesture.toString())
-    }
+    override fun onGestureDetected(gesture: Gesture) = Unit
 }

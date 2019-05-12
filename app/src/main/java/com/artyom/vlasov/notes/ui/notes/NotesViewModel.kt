@@ -20,6 +20,57 @@ class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel
         }
     }
 
+    fun onSwipeRight() {
+        if (isConfirmationMode) {
+            removeCurrentNote()
+            exitConfirmationMode()
+        } else {
+            showNextNote()
+        }
+    }
+
+    private fun showNextNote() {
+        currentNoteIndex++
+        if (currentNoteIndex == allNotes.size) currentNoteIndex = 0
+        setCurrentNote(currentNoteIndex)
+    }
+
+    fun onSwipeLeft() {
+        if (isConfirmationMode) {
+            exitConfirmationMode()
+        } else {
+            showPreviousNote()
+        }
+    }
+
+    private fun showPreviousNote() {
+        currentNoteIndex--
+        if (currentNoteIndex == -1) currentNoteIndex = allNotes.size - 1
+        setCurrentNote(currentNoteIndex)
+    }
+
+    fun onDoubleTapDoubleFinger() {
+        enterConfirmationMode()
+    }
+
+    private fun removeCurrentNote() {
+        launch {
+            allNotes.getOrNull(currentNoteIndex)?.run {
+                databaseRepository.deleteNote(this)
+                allNotes.remove(this)
+                updateNotesAfterDeleting()
+            }
+        }
+    }
+
+    private fun updateNotesAfterDeleting() {
+        when {
+            allNotes.isEmpty() -> resetCurrentNote()
+            allNotes.size == currentNoteIndex && allNotes.size != 1 -> setCurrentNote(currentNoteIndex - 1)
+            else -> setCurrentNote(currentNoteIndex)
+        }
+    }
+
     private fun setCurrentNote(index: Int) {
         allNotes.getOrNull(index)?.run {
             currentNoteTitle.postValue(title)
@@ -27,15 +78,8 @@ class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel
         }
     }
 
-    fun onNextNoteCalled() {
-        currentNoteIndex++
-        if (currentNoteIndex == allNotes.size) currentNoteIndex = 0
-        setCurrentNote(currentNoteIndex)
-    }
-
-    fun onPreviousNoteCalled() {
-        currentNoteIndex--
-        if (currentNoteIndex == -1) currentNoteIndex = allNotes.size - 1
-        setCurrentNote(currentNoteIndex)
+    private fun resetCurrentNote() {
+        currentNoteTitle.postValue("")
+        currentNoteText.postValue("")
     }
 }
