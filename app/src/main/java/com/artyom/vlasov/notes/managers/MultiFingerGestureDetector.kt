@@ -1,6 +1,5 @@
 package com.artyom.vlasov.notes.managers
 
-import android.content.Context
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -12,14 +11,26 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MultiFingerGestureDetector private constructor(
-    context: Context,
+    view: View,
     private val onGestureListener: (Gesture) -> Unit
 ) : GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
-    private val gestureCompat = GestureDetectorCompat(context, this)
+    private var beginTouchTime = 0L
+    private var doubleTapCounter = 0
+    private var tapDelayJob: Job? = null
+    private var skipNextInvocation = false
+    private var startX = 0f
+    private var startY = 0f
+    private var isAfterActionPointerUp = false
+
+    private val gestureCompatDetector = GestureDetectorCompat(view.context, this)
 
     init {
-        gestureCompat.setOnDoubleTapListener(this)
+        gestureCompatDetector.setOnDoubleTapListener(this)
+        view.setOnTouchListener { _, event ->
+            handleSwipeAndMultiFingerTapListener(event, onGestureListener)
+            gestureCompatDetector.onTouchEvent(event)
+        }
     }
 
     override fun onShowPress(e: MotionEvent?) {
@@ -64,51 +75,66 @@ class MultiFingerGestureDetector private constructor(
         return true
     }
 
-    companion object {
-        private var beginTouchTime = 0L
-        private var tapCounter = 0
-        private var tapDelayJob: Job? = null
-        private var skipNextInvocation = false
-
-        fun runDetecting(view: View, onGestureListener: (Gesture) -> Unit) {
-            val detector = GestureDetectorCompat(
-                view.context,
-                MultiFingerGestureDetector(view.context, onGestureListener)
-            )
-
-            view.setOnTouchListener { _, event ->
-                handleMultiFingerTouchListener(event, onGestureListener)
-                detector.onTouchEvent(event)
+    private fun handleSwipeAndMultiFingerTapListener(event: MotionEvent, onGestureListener: (Gesture) -> Unit) {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                startX = event.x
+                startY = event.y
             }
-        }
-
-        private fun handleMultiFingerTouchListener(event: MotionEvent, onGestureListener: (Gesture) -> Unit) {
-            when (event.actionMasked) {
-                MotionEvent.ACTION_POINTER_DOWN -> {
-                    beginTouchTime = System.currentTimeMillis()
+            MotionEvent.ACTION_UP -> {
+                if (isAfterActionPointerUp) {
+                    isAfterActionPointerUp = false
+                    return
                 }
-                MotionEvent.ACTION_POINTER_UP -> {
-                    val releasedTouchDuration = System.currentTimeMillis() - beginTouchTime
-                    when {
-                        event.pointerCount > 2 -> skipNextInvocation = true
-                        event.pointerCount == 2 && skipNextInvocation -> skipNextInvocation = false
-                        releasedTouchDuration < 500 && event.pointerCount == 2 && !skipNextInvocation -> {
-                            tapCounter++
-                            if (tapCounter < 2) {
-                                tapDelayJob = GlobalScope.launch {
-                                    delay(300)
-                                    onGestureListener.invoke(Gesture.Tap.Single.DoubleFinger)
-                                    tapCounter = 0
-                                }
-                            } else {
-                                tapDelayJob?.cancel()
-                                onGestureListener.invoke(Gesture.Tap.Double.DoubleFinger)
-                                tapCounter = 0
+                val swipedHorizontally = Math.abs(event.x - startX) > DEFAULT_SWIPED_THRESHOLD
+
+                if (swipedHorizontally) {
+                    val swipedRight = event.x > startX
+                    val swipedLeft = event.x < startX
+
+                    if (swipedRight) {
+                        onGestureListener.invoke(Gesture.Swipe.Right)
+                    }
+                    if (swipedLeft) {
+                        onGestureListener.invoke(Gesture.Swipe.Left)
+                    }
+                }
+                startX = 0f
+                startY = 0f
+            }
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                beginTouchTime = System.currentTimeMillis()
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+                isAfterActionPointerUp = true
+                val releasedTouchDuration = System.currentTimeMillis() - beginTouchTime
+                when {
+                    event.pointerCount > 2 -> skipNextInvocation = true
+                    event.pointerCount == 2 && skipNextInvocation -> skipNextInvocation = false
+                    releasedTouchDuration < 500 && event.pointerCount == 2 && !skipNextInvocation -> {
+                        doubleTapCounter++
+                        if (doubleTapCounter < 2) {
+                            tapDelayJob = GlobalScope.launch {
+                                delay(300)
+                                onGestureListener.invoke(Gesture.Tap.Single.DoubleFinger)
+                                doubleTapCounter = 0
                             }
+                        } else {
+                            tapDelayJob?.cancel()
+                            onGestureListener.invoke(Gesture.Tap.Double.DoubleFinger)
+                            doubleTapCounter = 0
                         }
                     }
                 }
             }
+        }
+    }
+
+    companion object {
+        const val DEFAULT_SWIPED_THRESHOLD = 100
+
+        fun runDetecting(view: View, onGestureListener: (Gesture) -> Unit) {
+            MultiFingerGestureDetector(view, onGestureListener)
         }
     }
 }

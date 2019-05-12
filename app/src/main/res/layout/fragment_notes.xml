@@ -36,21 +36,7 @@
                 android:text="@{viewModel.currentNoteText}"
                 android:textColor="@color/black"
                 android:textSize="70sp"
-                tools:text="Accessible note text that is large"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:onClick="@{() -> viewModel.onPreviousNoteCalled()}"
-                android:text="Previous"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:onClick="@{() -> viewModel.onNextNoteCalled()}"
-                android:text="Next"/>
+                tools:text="Accessible note text that is large "/>
         </LinearLayout>
     </ScrollView>
 

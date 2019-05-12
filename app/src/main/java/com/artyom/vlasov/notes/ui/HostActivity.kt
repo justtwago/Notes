@@ -10,4 +10,6 @@ class HostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_host)
     }
+
+    override fun onBackPressed() = Unit
 }
