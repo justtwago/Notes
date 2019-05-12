@@ -23,5 +23,5 @@ val appModule = module {
     }
 
     viewModel { NotesViewModel(databaseRepository = get()) }
-    viewModel { NoteDetailsViewModel() }
+    viewModel { NoteDetailsViewModel(databaseRepository = get()) }
 }

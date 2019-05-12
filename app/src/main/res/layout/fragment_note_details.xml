@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -8,12 +11,35 @@
             type="com.artyom.vlasov.notes.ui.details.NoteDetailsViewModel"/>
     </data>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:onGestureDetectedListener="@{viewModel.onGestureDetectedListener}">
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.currentNoteTitle}"
+                android:textColor="@color/black"
+                android:textSize="70sp"
+                tools:text="Accessible title"/>
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@{viewModel.currentNoteText}"
+                android:textColor="@color/black"
+                android:textSize="70sp"
+                tools:text="Accessible note text that is large "/>
+        </LinearLayout>
+    </ScrollView>
 
 </layout>

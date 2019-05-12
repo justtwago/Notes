@@ -10,6 +10,9 @@ interface NoteDao {
     @Query("SELECT * FROM note")
     fun getAll(): List<Note>
 
+    @Query("SELECT * FROM note WHERE id == :id LIMIT 1")
+    fun getNote(id: Int): Note
+
     @Delete
     fun delete(note: Note)
 

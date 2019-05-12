@@ -1,17 +1,29 @@
 package com.artyom.vlasov.notes.ui.notes
 
 import androidx.lifecycle.MutableLiveData
+import com.artyom.vlasov.notes.model.Gesture
+import com.artyom.vlasov.notes.model.SingleLiveEvent
 import com.artyom.vlasov.notes.model.database.entities.Note
 import com.artyom.vlasov.notes.model.repository.DatabaseRepository
 import com.artyom.vlasov.notes.ui.base.BaseViewModel
 import kotlinx.coroutines.launch
 
-class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel() {
-    val currentNoteTitle = MutableLiveData<String>()
-    val currentNoteText = MutableLiveData<String>()
-
+class NotesViewModel(private val databaseRepository: DatabaseRepository) : BaseViewModel() {
     private val allNotes = mutableListOf<Note>()
     private var currentNoteIndex = 0
+
+    val openNoteDetailsEvent = SingleLiveEvent<Int>()
+    val currentNoteTitle = MutableLiveData<String>()
+    val currentNoteText = MutableLiveData<String>()
+    val onGestureDetectedListener: (Gesture) -> Unit = { gesture ->
+        when (gesture) {
+            Gesture.Swipe.Right -> onSwipeRight()
+            Gesture.Swipe.Left -> onSwipeLeft()
+            Gesture.Tap.Double.DoubleFinger -> onDoubleTapDoubleFinger()
+            Gesture.Tap.Double.SingleFinger -> onDoubleTapSingleFinger()
+            Gesture.Tap.Single.DoubleFinger -> onSingleTapDoubleFinger()
+        }
+    }
 
     init {
         launch {
@@ -20,7 +32,7 @@ class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel
         }
     }
 
-    fun onSwipeRight() {
+    private fun onSwipeRight() {
         if (isConfirmationMode) {
             removeCurrentNote()
             exitConfirmationMode()
@@ -35,7 +47,7 @@ class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel
         setCurrentNote(currentNoteIndex)
     }
 
-    fun onSwipeLeft() {
+    private fun onSwipeLeft() {
         if (isConfirmationMode) {
             exitConfirmationMode()
         } else {
@@ -49,7 +61,7 @@ class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel
         setCurrentNote(currentNoteIndex)
     }
 
-    fun onDoubleTapDoubleFinger() {
+    private fun onDoubleTapDoubleFinger() {
         enterConfirmationMode()
     }
 
@@ -81,5 +93,15 @@ class NotesViewModel(val databaseRepository: DatabaseRepository) : BaseViewModel
     private fun resetCurrentNote() {
         currentNoteTitle.postValue("")
         currentNoteText.postValue("")
+    }
+
+    private fun onDoubleTapSingleFinger() {
+        openNoteDetailsEvent.value = Note.UNDEFINED_ID
+    }
+
+    private fun onSingleTapDoubleFinger() {
+        if (allNotes.isNotEmpty()) {
+            openNoteDetailsEvent.postValue(currentNoteIndex)
+        }
     }
 }

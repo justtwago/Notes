@@ -6,6 +6,8 @@ import com.artyom.vlasov.notes.model.database.entities.Note
 interface DatabaseRepository {
     suspend fun getAllNotes(): List<Note>
 
+    suspend fun getNote(id: Int): Note
+
     suspend fun insertNote(vararg note: Note)
 
     suspend fun updateNote(note: Note)
@@ -17,6 +19,10 @@ class DatabaseRepositoryImpl(val noteDao: NoteDao) : DatabaseRepository {
 
     override suspend fun getAllNotes(): List<Note> {
         return noteDao.getAll()
+    }
+
+    override suspend fun getNote(id: Int): Note {
+        return noteDao.getNote(id)
     }
 
     override suspend fun insertNote(vararg note: Note) {

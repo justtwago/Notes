@@ -1,8 +1,11 @@
 package com.artyom.vlasov.notes.ui.notes
 
+import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.artyom.vlasov.notes.R
 import com.artyom.vlasov.notes.databinding.FragmentNotesBinding
-import com.artyom.vlasov.notes.model.Gesture
 import com.artyom.vlasov.notes.ui.base.BaseFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -14,11 +17,15 @@ class NotesFragment : BaseFragment<FragmentNotesBinding>() {
         binding.viewModel = viewModel
     }
 
-    override fun onGestureDetected(gesture: Gesture) {
-        when (gesture) {
-            Gesture.Swipe.Right -> viewModel.onSwipeRight()
-            Gesture.Swipe.Left -> viewModel.onSwipeLeft()
-            Gesture.Tap.Double.DoubleFinger -> viewModel.onDoubleTapDoubleFinger()
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        registerObservers()
+    }
+
+    private fun registerObservers() {
+        viewModel.openNoteDetailsEvent.observe(viewLifecycleOwner, Observer {
+            val direction = NotesFragmentDirections.actionNotesToDetails(it)
+            findNavController().navigate(direction)
+        })
     }
 }
