@@ -9,7 +9,6 @@ import com.artyom.vlasov.notes.ui.notes.NotesViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
-import kotlin.math.sin
 
 val appModule = module {
 
@@ -23,6 +22,6 @@ val appModule = module {
         DatabaseRepositoryImpl(noteDao = get()) as DatabaseRepository
     }
 
-    viewModel { NotesViewModel() }
+    viewModel { NotesViewModel(databaseRepository = get()) }
     viewModel { NoteDetailsViewModel() }
 }

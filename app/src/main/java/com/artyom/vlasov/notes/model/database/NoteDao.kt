@@ -14,7 +14,7 @@ interface NoteDao {
     fun delete(note: Note)
 
     @Insert(onConflict = REPLACE)
-    fun insert(note: Note)
+    fun insert(vararg note: Note)
 
     @Update
     fun update(note: Note)

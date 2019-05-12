@@ -1,27 +1,16 @@
 package com.artyom.vlasov.notes.ui.base
 
+import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-abstract class BaseViewModel : ViewModel() {
-    private lateinit var coroutineScope: CoroutineScope
+abstract class BaseViewModel : ViewModel(), CoroutineScope {
 
-    fun initCoroutineScope(coroutineScope: CoroutineScope) {
-        this.coroutineScope = coroutineScope
-    }
+    override val coroutineContext: CoroutineContext by lazy { Dispatchers.IO + SupervisorJob() }
 
-    fun launch(action: suspend () -> Unit) {
-        coroutineScope.launch {
-            action.invoke()
-        }
-    }
-
-    @ExperimentalCoroutinesApi
+    @CallSuper
     override fun onCleared() {
-        coroutineScope.cancel()
-        super.onCleared()
+        coroutineContext.cancel()
     }
 }
