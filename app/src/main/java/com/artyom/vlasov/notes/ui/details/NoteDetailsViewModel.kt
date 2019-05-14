@@ -43,4 +43,8 @@ class NoteDetailsViewModel(private val databaseRepository: DatabaseRepository) :
         exitConfirmationMode()
         openNotesEvent.call()
     }
+
+    override fun callAssistantInstructions() {
+
+    }
 }

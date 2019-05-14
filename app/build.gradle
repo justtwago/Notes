@@ -39,7 +39,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$versions.ktx"
     implementation "androidx.fragment:fragment-ktx:$versions.ktxFragment"
     implementation "androidx.appcompat:appcompat:$versions.androidx"
-    implementation "androidx.lifecycle:lifecycle-viewmodel:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
     implementation "android.arch.navigation:navigation-fragment-ktx:$versions.navigation"
     implementation "android.arch.navigation:navigation-fragment:$versions.navigation"
     implementation "android.arch.navigation:navigation-ui:$versions.navigation"
@@ -55,9 +55,6 @@ dependencies {
     implementation "org.koin:koin-androidx-viewmodel:$versions.koin"
 
     implementation "androidx.legacy:legacy-support-v4:$versions.legacySupport"
-
-    implementation "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:$versions.bindingCollections"
-    implementation "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:$versions.bindingCollections"
 
     testImplementation "junit:junit:$versions.junit"
     testImplementation "org.assertj:assertj-core:$versions.assertj"

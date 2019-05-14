@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Notes</string>
+    <string name="instruction_swipe_left">Swipe to left to %s</string>
+    <string name="instruction_swipe_right">Swipe to right to %s</string>
+    <string name="instruction_long_press">Long press for %s</string>
+    <string name="instruction_single_tap_single_finger">Tap once with one finger to %s</string>
+    <string name="instruction_single_tap_double_finger">Tap twice with one finger to %s</string>
+    <string name="instruction_double_tap_single_finger">Tap once with two finger to %s</string>
+    <string name="instruction_double_tap_double_finger">Tap twice with two finger to %s</string>
+    <string name="listen_instruction">listen instructions</string>
+    <string name="listen_note">listen this note</string>
+    <string name="create_note">create a note</string>
+    <string name="delete_note">delete this note</string>
+    <string name="edit_note">edit this note</string>
+    <string name="pick_next_note">pick next note</string>
+    <string name="pick_previous_note">pick previous note</string>
+    <string name="record_title">record note title</string>
+    <string name="record_note_text">record note text</string>
+    <string name="confirm_deleting">confirm deleting note</string>
+    <string name="cancel_deleting">cancel deleting note</string>
 </resources>

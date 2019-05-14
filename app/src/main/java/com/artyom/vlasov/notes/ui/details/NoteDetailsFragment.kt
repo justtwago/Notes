@@ -1,7 +1,5 @@
 package com.artyom.vlasov.notes.ui.details
 
-import android.os.Bundle
-import android.view.View
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.artyom.vlasov.notes.R
@@ -17,8 +15,7 @@ class NoteDetailsFragment : BaseFragment<FragmentNoteDetailsBinding>() {
         binding.viewModel = viewModel
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onTextToSpeechReady() {
         val noteId = NoteDetailsFragmentArgs.fromBundle(arguments!!).noteId
         viewModel.initialize(noteId)
         registerObservers()

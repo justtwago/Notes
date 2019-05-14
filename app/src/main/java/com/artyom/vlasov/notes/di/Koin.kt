@@ -1,6 +1,7 @@
 package com.artyom.vlasov.notes.di
 
 import androidx.room.Room
+import com.artyom.vlasov.notes.model.AssistantInstructionProvider
 import com.artyom.vlasov.notes.model.database.NoteDatabase
 import com.artyom.vlasov.notes.model.repository.DatabaseRepository
 import com.artyom.vlasov.notes.model.repository.DatabaseRepositoryImpl
@@ -18,10 +19,9 @@ val appModule = module {
             .noteDao()
     }
 
-    single {
-        DatabaseRepositoryImpl(noteDao = get()) as DatabaseRepository
-    }
+    single { DatabaseRepositoryImpl(noteDao = get()) as DatabaseRepository }
+    single { AssistantInstructionProvider(androidApplication()) }
 
-    viewModel { NotesViewModel(databaseRepository = get()) }
+    viewModel { NotesViewModel(databaseRepository = get(), assistantInstructionProvider = get()) }
     viewModel { NoteDetailsViewModel(databaseRepository = get()) }
 }

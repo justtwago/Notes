@@ -1,13 +1,13 @@
 package com.artyom.vlasov.notes.ui.notes
 
-import android.os.Bundle
-import android.view.View
+import android.speech.tts.TextToSpeech
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.artyom.vlasov.notes.R
 import com.artyom.vlasov.notes.databinding.FragmentNotesBinding
 import com.artyom.vlasov.notes.ui.base.BaseFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class NotesFragment : BaseFragment<FragmentNotesBinding>() {
     override val layoutId = R.layout.fragment_notes
@@ -17,15 +17,23 @@ class NotesFragment : BaseFragment<FragmentNotesBinding>() {
         binding.viewModel = viewModel
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onTextToSpeechReady() {
         registerObservers()
+        textToSpeech.language = Locale.ENGLISH
     }
 
     private fun registerObservers() {
         viewModel.openNoteDetailsEvent.observe(viewLifecycleOwner, Observer {
             val direction = NotesFragmentDirections.actionNotesToDetails(it)
             findNavController().navigate(direction)
+        })
+        viewModel.assistantInstructions.observe(viewLifecycleOwner, Observer {instructions ->
+            instructions.forEach {
+                textToSpeech.speak(it, TextToSpeech.QUEUE_ADD, null, "")
+            }
+        })
+        viewModel.stopAssistantVoice.observe(viewLifecycleOwner, Observer {
+            textToSpeech.stop()
         })
     }
 }

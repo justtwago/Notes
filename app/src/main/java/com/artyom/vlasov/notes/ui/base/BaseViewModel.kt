@@ -13,12 +13,16 @@ abstract class BaseViewModel : ViewModel(), CoroutineScope {
     protected val isConfirmationMode: Boolean
         get() = confirmationMode.value == true
 
+    abstract fun callAssistantInstructions()
+
     protected fun enterConfirmationMode() {
-        confirmationMode.value = true
+        confirmationMode.postValue(true)
+        callAssistantInstructions()
     }
 
     protected fun exitConfirmationMode() {
-        confirmationMode.value = false
+        confirmationMode.postValue(false)
+        callAssistantInstructions()
     }
 
     @CallSuper
