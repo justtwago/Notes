@@ -20,6 +20,7 @@ class NotesViewModel(
 
     val openNoteDetailsEvent = SingleLiveEvent<Int>()
     val stopAssistantVoice = SingleLiveEvent<Unit>()
+    val listenPickedNote = SingleLiveEvent<Note>()
     val assistantInstructions = MutableLiveData<List<String>>()
     val currentNoteTitle = MutableLiveData<String>()
     val currentNoteText = MutableLiveData<String>()
@@ -32,11 +33,13 @@ class NotesViewModel(
             Gesture.Tap.Double.DoubleFinger -> onDoubleTapDoubleFingerDetected()
             Gesture.Tap.Double.SingleFinger -> onDoubleTapSingleFingerDetected()
             Gesture.Tap.Single.DoubleFinger -> onSingleTapDoubleFingerDetected()
+            Gesture.Tap.Single.SingleFinger -> onSingleTapSingleFingerDetected()
         }
     }
 
     init {
         launch {
+            databaseRepository.insertNote(Note(0, "One one one", "one one one"), Note(1, "Two two two", "Two two two"))
             allNotes.addAll(databaseRepository.getAllNotes())
             setCurrentNote(currentNoteIndex)
             callAssistantInstructions()
@@ -45,9 +48,9 @@ class NotesViewModel(
 
     override fun callAssistantInstructions() {
         val assistantState = when {
+            confirmationMode -> AssistantState.CONFIRMATION_MODE
             allNotes.isEmpty() -> AssistantState.EMPTY_NOTES
             allNotes.size == 1 -> AssistantState.SINGLE_NOTE
-            isConfirmationMode -> AssistantState.CONFIRMATION_MODE
             else -> AssistantState.DEFAULT
         }
 
@@ -104,10 +107,11 @@ class NotesViewModel(
     }
 
     private fun onSwipeRightDetected() {
-        if (isConfirmationMode) {
+        if (confirmationMode) {
             removeCurrentNote()
         } else {
             showNextNote()
+            listenPickedNote.postValue(allNotes.getOrNull(currentNoteIndex))
         }
     }
 
@@ -118,10 +122,11 @@ class NotesViewModel(
     }
 
     private fun onSwipeLeftDetected() {
-        if (isConfirmationMode) {
+        if (confirmationMode) {
             exitConfirmationMode()
         } else {
             showPreviousNote()
+            listenPickedNote.postValue(allNotes.getOrNull(currentNoteIndex))
         }
     }
 
@@ -136,7 +141,9 @@ class NotesViewModel(
     }
 
     private fun onDoubleTapDoubleFingerDetected() {
-        enterConfirmationMode()
+        if (allNotes.isNotEmpty()) {
+            enterConfirmationMode()
+        }
     }
 
     private fun removeCurrentNote() {
@@ -153,7 +160,7 @@ class NotesViewModel(
     private fun updateNotesAfterDeleting() {
         when {
             allNotes.isEmpty() -> resetCurrentNote()
-            allNotes.size == currentNoteIndex && allNotes.size != 1 -> setCurrentNote(currentNoteIndex - 1)
+            allNotes.size == currentNoteIndex -> setCurrentNote(--currentNoteIndex)
             else -> setCurrentNote(currentNoteIndex)
         }
     }
@@ -161,7 +168,7 @@ class NotesViewModel(
     private fun setCurrentNote(index: Int) {
         allNotes.getOrNull(index)?.run {
             currentNoteTitle.postValue(title)
-            currentNoteText.postValue(note)
+            currentNoteText.postValue(text)
         }
     }
 
@@ -178,6 +185,10 @@ class NotesViewModel(
         if (allNotes.isNotEmpty()) {
             openNoteDetailsEvent.postValue(currentNoteIndex)
         }
+    }
+
+    private fun onSingleTapSingleFingerDetected() {
+        listenPickedNote.postValue(allNotes.getOrNull(currentNoteIndex))
     }
 
     enum class AssistantState {

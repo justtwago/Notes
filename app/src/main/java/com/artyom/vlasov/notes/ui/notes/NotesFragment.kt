@@ -27,13 +27,27 @@ class NotesFragment : BaseFragment<FragmentNotesBinding>() {
             val direction = NotesFragmentDirections.actionNotesToDetails(it)
             findNavController().navigate(direction)
         })
-        viewModel.assistantInstructions.observe(viewLifecycleOwner, Observer {instructions ->
-            instructions.forEach {
-                textToSpeech.speak(it, TextToSpeech.QUEUE_ADD, null, "")
-            }
+        viewModel.assistantInstructions.observe(viewLifecycleOwner, Observer { instructions ->
+            instructions.forEach(::speakTextWithQueue)
         })
         viewModel.stopAssistantVoice.observe(viewLifecycleOwner, Observer {
             textToSpeech.stop()
         })
+        viewModel.listenPickedNote.observe(viewLifecycleOwner, Observer { note ->
+            note?.apply {
+                if (!title.isBlank()) {
+                    speakTextWithQueue(getString(R.string.note_title))
+                    speakTextWithQueue(title)
+                }
+                if (!text.isBlank()) {
+                    speakTextWithQueue(getString(R.string.note_text))
+                    speakTextWithQueue(text)
+                }
+            }
+        })
+    }
+
+    private fun speakTextWithQueue(text: String) {
+        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, "")
     }
 }

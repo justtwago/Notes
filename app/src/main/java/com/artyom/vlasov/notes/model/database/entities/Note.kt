@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class Note(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "note") val note: String
+    @ColumnInfo(name = "text") val text: String
 ) {
 
     companion object {

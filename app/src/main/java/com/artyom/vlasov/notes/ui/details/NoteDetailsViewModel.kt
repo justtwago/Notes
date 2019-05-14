@@ -25,7 +25,7 @@ class NoteDetailsViewModel(private val databaseRepository: DatabaseRepository) :
             launch {
                 val note = databaseRepository.getNote(noteId)
                 currentNoteTitle.postValue(note.title)
-                currentNoteText.postValue(note.note)
+                currentNoteText.postValue(note.text)
             }
         }
     }

@@ -9,19 +9,17 @@ import kotlin.coroutines.CoroutineContext
 abstract class BaseViewModel : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext by lazy { Dispatchers.IO + SupervisorJob() }
 
-    private val confirmationMode = MutableLiveData<Boolean>()
-    protected val isConfirmationMode: Boolean
-        get() = confirmationMode.value == true
+    protected var confirmationMode = false
 
     abstract fun callAssistantInstructions()
 
     protected fun enterConfirmationMode() {
-        confirmationMode.postValue(true)
+        confirmationMode = true
         callAssistantInstructions()
     }
 
     protected fun exitConfirmationMode() {
-        confirmationMode.postValue(false)
+        confirmationMode = false
         callAssistantInstructions()
     }
 
