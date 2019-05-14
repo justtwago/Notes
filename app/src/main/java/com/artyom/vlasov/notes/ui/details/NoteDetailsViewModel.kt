@@ -20,6 +20,8 @@ class NoteDetailsViewModel(
     val openNotesEvent = SingleLiveEvent<Unit>()
     val stopAssistantVoice = SingleLiveEvent<Unit>()
     val listenCurrentNote = SingleLiveEvent<Note>()
+    val recordNoteTitle = SingleLiveEvent<Unit>()
+    val recordNoteText = SingleLiveEvent<Unit>()
     val currentNoteTitle = MutableLiveData<String>()
     val currentNoteText = MutableLiveData<String>()
     val assistantInstructions = MutableLiveData<List<String>>()
@@ -36,6 +38,7 @@ class NoteDetailsViewModel(
 
     fun initialize(noteId: Long) {
         callAssistantInstructions()
+        this.noteId = noteId
         if (noteId != Note.UNDEFINED_ID) {
             launch {
                 val note = databaseRepository.getNote(noteId)
@@ -67,6 +70,16 @@ class NoteDetailsViewModel(
         }
     }
 
+    fun onTitleRecognized(title: String) {
+        currentNoteTitle.value = title
+        onSingleTapSingleFingerDetected()
+    }
+
+    fun onTextRecognized(text: String) {
+        currentNoteText.value = text
+        onSingleTapSingleFingerDetected()
+    }
+
     private fun onDoubleTapSingleFingerDetected() {
         enterConfirmationMode()
     }
@@ -75,7 +88,7 @@ class NoteDetailsViewModel(
         if (isConfirmationMode) {
             openNotesEvent.call()
         } else {
-            //TODO: Record Title
+            recordNoteTitle.call()
         }
     }
 
@@ -86,7 +99,7 @@ class NoteDetailsViewModel(
                 launch(Dispatchers.Main) { openNotesEvent.call() }
             }
         } else {
-            //TODO: Record Text
+            recordNoteText.call()
         }
     }
 
@@ -108,13 +121,23 @@ class NoteDetailsViewModel(
         val title = currentNoteTitle.value.orEmpty()
         val text = currentNoteText.value.orEmpty()
         if (!(title.isBlank() && text.isBlank())) {
-            databaseRepository.insertNote(
-                Note(
-                    id = if (noteId != Note.UNDEFINED_ID) noteId else Calendar.getInstance().timeInMillis,
-                    title = title,
-                    text = text
+            if (noteId == Note.UNDEFINED_ID) {
+                databaseRepository.insertNote(
+                    Note(
+                        id = Calendar.getInstance().timeInMillis,
+                        title = title,
+                        text = text
+                    )
                 )
-            )
+            } else {
+                databaseRepository.updateNote(
+                    Note(
+                        id = noteId,
+                        title = title,
+                        text = text
+                    )
+                )
+            }
         }
     }
 
