@@ -6,12 +6,12 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "note")
 data class Note(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: Long,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "text") val text: String
 ) {
 
     companion object {
-        const val UNDEFINED_ID = -1
+        const val UNDEFINED_ID = -1L
     }
 }

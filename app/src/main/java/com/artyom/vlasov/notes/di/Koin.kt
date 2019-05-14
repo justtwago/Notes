@@ -23,5 +23,5 @@ val appModule = module {
     single { AssistantInstructionProvider(androidApplication()) }
 
     viewModel { NotesViewModel(databaseRepository = get(), assistantInstructionProvider = get()) }
-    viewModel { NoteDetailsViewModel(databaseRepository = get()) }
+    viewModel { NoteDetailsViewModel(databaseRepository = get(), assistantInstructionProvider = get()) }
 }

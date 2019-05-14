@@ -11,7 +11,7 @@ interface NoteDao {
     fun getAll(): List<Note>
 
     @Query("SELECT * FROM note WHERE id == :id LIMIT 1")
-    fun getNote(id: Int): Note
+    fun getNote(id: Long): Note
 
     @Delete
     fun delete(note: Note)

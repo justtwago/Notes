@@ -1,5 +1,6 @@
 package com.artyom.vlasov.notes.ui.details
 
+import android.speech.tts.TextToSpeech
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.artyom.vlasov.notes.R
@@ -26,5 +27,27 @@ class NoteDetailsFragment : BaseFragment<FragmentNoteDetailsBinding>() {
             val direction = NoteDetailsFragmentDirections.actionDetailsToNotes()
             findNavController().navigate(direction)
         })
+        viewModel.assistantInstructions.observe(viewLifecycleOwner, Observer { instructions ->
+            instructions.forEach(::speakTextWithQueue)
+        })
+        viewModel.stopAssistantVoice.observe(viewLifecycleOwner, Observer {
+            textToSpeech.stop()
+        })
+        viewModel.listenCurrentNote.observe(viewLifecycleOwner, Observer { note ->
+            note?.apply {
+                if (!title.isBlank()) {
+                    speakTextWithQueue(getString(R.string.note_title))
+                    speakTextWithQueue(title)
+                }
+                if (!text.isBlank()) {
+                    speakTextWithQueue(getString(R.string.note_text))
+                    speakTextWithQueue(text)
+                }
+            }
+        })
+    }
+
+    private fun speakTextWithQueue(text: String) {
+        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, "")
     }
 }

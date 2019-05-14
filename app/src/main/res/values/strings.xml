@@ -20,4 +20,9 @@
     <string name="cancel_deleting">cancel deleting note</string>
     <string name="note_title">Note title</string>
     <string name="note_text">Note text</string>
+    <string name="return_to_note_list">Return to note list</string>
+    <string name="save_note">Save this note</string>
+    <string name="discard_note_changes">Discard the note changes</string>
+    <string name="note_list_location">You are in the section of all notes</string>
+    <string name="note_details_location">You are in the section of note details</string>
 </resources>

@@ -18,7 +18,7 @@ class NotesViewModel(
     private val allNotes = mutableListOf<Note>()
     private var currentNoteIndex = 0
 
-    val openNoteDetailsEvent = SingleLiveEvent<Int>()
+    val openNoteDetailsEvent = SingleLiveEvent<Long>()
     val stopAssistantVoice = SingleLiveEvent<Unit>()
     val listenPickedNote = SingleLiveEvent<Note>()
     val assistantInstructions = MutableLiveData<List<String>>()
@@ -39,21 +39,21 @@ class NotesViewModel(
 
     init {
         launch {
-            databaseRepository.insertNote(Note(0, "One one one", "one one one"), Note(1, "Two two two", "Two two two"))
             allNotes.addAll(databaseRepository.getAllNotes())
             setCurrentNote(currentNoteIndex)
-            callAssistantInstructions()
+            launch(Dispatchers.Main) { callAssistantInstructions() }
         }
     }
 
     override fun callAssistantInstructions() {
         val assistantState = when {
-            confirmationMode -> AssistantState.CONFIRMATION_MODE
+            isConfirmationMode -> AssistantState.CONFIRMATION_MODE
             allNotes.isEmpty() -> AssistantState.EMPTY_NOTES
             allNotes.size == 1 -> AssistantState.SINGLE_NOTE
             else -> AssistantState.DEFAULT
         }
 
+        val noteListLocation = assistantInstructionProvider.noteListLocation
         val listenInstructions = assistantInstructionProvider.listenInstructions
         val pickPreviousNote = when (assistantState) {
             AssistantState.DEFAULT -> assistantInstructionProvider.pickPreviousNote
@@ -93,6 +93,7 @@ class NotesViewModel(
 
         assistantInstructions.postValue(
             listOf(
+                noteListLocation,
                 pickPreviousNote,
                 pickNextNote,
                 createNote,
@@ -107,7 +108,7 @@ class NotesViewModel(
     }
 
     private fun onSwipeRightDetected() {
-        if (confirmationMode) {
+        if (isConfirmationMode) {
             removeCurrentNote()
         } else {
             showNextNote()
@@ -122,7 +123,7 @@ class NotesViewModel(
     }
 
     private fun onSwipeLeftDetected() {
-        if (confirmationMode) {
+        if (isConfirmationMode) {
             exitConfirmationMode()
         } else {
             showPreviousNote()
@@ -178,12 +179,12 @@ class NotesViewModel(
     }
 
     private fun onDoubleTapSingleFingerDetected() {
-        openNoteDetailsEvent.value = Note.UNDEFINED_ID
+        openNoteDetailsEvent.postValue(Note.UNDEFINED_ID)
     }
 
     private fun onSingleTapDoubleFingerDetected() {
         if (allNotes.isNotEmpty()) {
-            openNoteDetailsEvent.postValue(currentNoteIndex)
+            allNotes.getOrNull(currentNoteIndex)?.let { openNoteDetailsEvent.postValue(it.id) }
         }
     }
 
